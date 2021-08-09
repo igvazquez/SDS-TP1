@@ -3,21 +3,27 @@ import java.util.Objects;
 public class Particle {
 
     private final long id;
-    private final Point coordinates;
+    private final State state;
     private final double radius;
 
-    public Particle(long id, long x, long y, double radius) {
+    public Particle(long id, double x, double y, double radius) {
         this.id = id;
         this.radius = radius;
-        this.coordinates = new Point(x, y);
+        this.state = new State(x, y);
+    }
+
+    public Particle(long id, double x, double y, double radius, double vx, double vy) {
+        this.id = id;
+        this.radius = radius;
+        this.state = new State(x, y, vx, vy);
     }
 
     public long getId() {
         return id;
     }
 
-    public Point getCoordinates() {
-        return coordinates;
+    public State getState() {
+        return state;
     }
 
     public double getRadius() {
@@ -29,38 +35,62 @@ public class Particle {
         if (this == o) return true;
         if (!(o instanceof Particle)) return false;
         Particle particle = (Particle) o;
-        return id == particle.id && radius == particle.radius && Objects.equals(coordinates, particle.coordinates);
+        return id == particle.id && radius == particle.radius && Objects.equals(state, particle.state);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, coordinates, radius);
+        return Objects.hash(id, state, radius);
     }
 
-    private static class Point{
+    private static class State{
 
-        private long x;
-        private long y;
+        private double x;
+        private double y;
+        private double vx;
+        private double vy;
 
-        public Point(long x, long y) {
+        public State(double x, double y) {
             this.x = x;
             this.y = y;
         }
 
-        public long getX() {
+        public State(double x, double y, double vx, double vy) {
+            this(x,y);
+            this.vx = vx;
+            this.vy = vy;
+        }
+
+        public double getX() {
             return x;
         }
 
-        public long getY() {
+        public double getY() {
             return y;
         }
 
-        public void setX(int x) {
+        public double getVX() {
+            return vx;
+        }
+
+        public double getVY() {
+            return vy;
+        }
+
+        public void setX(double x) {
             this.x = x;
         }
 
-        public void setY(int y) {
+        public void setY(double y) {
             this.y = y;
+        }
+
+        public void setVX(double vx) {
+            this.vx = vx;
+        }
+
+        public void setVY(double vy) {
+            this.vy = vy;
         }
     }
 }
