@@ -26,6 +26,14 @@ public class Particle {
         return state;
     }
 
+    public double getX(){
+        return state.x;
+    }
+
+    public double getY(){
+        return state.y;
+    }
+
     public double getRadius() {
         return radius;
     }
