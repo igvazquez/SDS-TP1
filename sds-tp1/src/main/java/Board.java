@@ -139,7 +139,37 @@ public class Board {
         return neighbours;
     }
 
-    public List<List<Particle>> getNeighbours(List<Particle> particles) {
-        return null;
+    public List<Particle> getNeighboursOf(Particle particle) {
+
+        if (!particles.contains(particle)){
+            throw new IllegalArgumentException("Particle does not belong to this board");
+        }
+
+        List<Particle> ret = new ArrayList<>();
+
+        int idx = calculateCellIndexOnBoard(particle.getX(), particle.getY());
+
+        Set<Particle> neighbours = neighboursMap.get(idx);
+
+        for (Particle n : neighbours){
+            if (particle.calculateDistance(n) < rc){
+                ret.add(n);
+            }
+        }
+
+        return ret;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder b = new StringBuilder(M*M);
+        b.append("Board:\n");
+        for (int i = 0; i < M * M; i++) {
+            b.append(particlesInCells.get(i).size()).append(" ");
+            if (i % M == M-1){
+                b.append("\n");
+            }
+        }
+        return b.toString();
     }
 }

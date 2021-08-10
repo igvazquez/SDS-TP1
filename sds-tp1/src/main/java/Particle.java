@@ -19,7 +19,7 @@ public class Particle {
     }
 
     public double calculateDistance(Particle p) {
-        return Math.sqrt((Math.pow((getX() - p.getX()), 2) + Math.pow((getY() - p.getY()), 2)))
+        return Math.sqrt(Math.pow((getX() - p.getX()), 2) + Math.pow((getY() - p.getY()), 2))
                 - radius - p.getRadius();
     }
 
@@ -54,6 +54,16 @@ public class Particle {
     @Override
     public int hashCode() {
         return Objects.hash(id, state, radius);
+    }
+
+    @Override
+    public String toString() {
+        return "Particle{" +
+                "id=" + id +
+                ", x=" + state.x +
+                ", y=" + state.y +
+                ", radius=" + radius +
+                '}';
     }
 
     private static class State{
