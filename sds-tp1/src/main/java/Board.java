@@ -5,9 +5,11 @@ public class Board {
     private final double L;
     private final int M;
     private final double rc;
-    private boolean periodicOutline;
+    private final boolean periodicOutline;
     final List<Particle> particles;
     final Map<Integer, List<Particle>> particlesInCells;
+
+    private static final int OUT_OF_BOUNDS = -1;
 
     public Board(double l, int m, double rc, List<Particle> particles, boolean periodicOutline) {
         L = l;
@@ -45,6 +47,70 @@ public class Board {
         return i + M*j;
     }
 
+    private void addNeighboursToCells(Map<Integer, Set<Particle>> neighbours, int currentCell, int neighbourCell) {
+        if(neighbourCell != OUT_OF_BOUNDS) {
+            if(currentCell != neighbourCell) {
+                neighbours.get(currentCell).addAll(particlesInCells.get(neighbourCell));
+                neighbours.get(neighbourCell).addAll(particlesInCells.get(currentCell));
+            } else {
+                neighbours.get(currentCell).addAll(particlesInCells.get(currentCell));
+            }
+        }
+    }
+
+    private int getRightIndex(int currentCellIndex, int row, int col) {
+        int rightCol;
+        if(periodicOutline) {
+            rightCol = Math.floorMod(currentCellIndex + 1, M);
+            return rightCol + row*M;
+        } else {
+            rightCol = col + 1;
+            return rightCol >= M ? OUT_OF_BOUNDS : rightCol + row*M;
+        }
+    }
+
+    private int getUpperRightIndex(int row, int col) {
+        int upperRightRow;
+        int upperRightCol;
+
+        if(periodicOutline) {
+            upperRightRow = Math.floorMod(row - 1, M);
+            upperRightCol = Math.floorMod(col + 1, M);
+            return upperRightCol + upperRightRow*M;
+        } else {
+            upperRightCol = col + 1;
+            upperRightRow = row - 1;
+            return (upperRightRow < 0 || upperRightCol >= M) ? OUT_OF_BOUNDS : upperRightCol + upperRightRow*M;
+        }
+    }
+
+    private int getLowerRightIndex(int row, int col) {
+        int lowerRightRow;
+        int lowerRightCol;
+
+        if(periodicOutline) {
+            lowerRightRow = Math.floorMod(row + 1, M);
+            lowerRightCol = Math.floorMod(col + 1, M);
+            return lowerRightCol + lowerRightRow*M;
+        } else {
+            lowerRightRow = row + 1;
+            lowerRightCol = col + 1;
+            return (lowerRightRow >= M || lowerRightCol >= M) ? OUT_OF_BOUNDS : lowerRightCol + lowerRightRow*M;
+        }
+    }
+
+    private int getLowerIndex(int row, int col) {
+        int lowerRow;
+
+        if(periodicOutline) {
+            lowerRow = Math.floorMod(row + 1, M);
+            return col + lowerRow*M;
+        } else {
+            lowerRow = row + 1;
+            return lowerRow >= M ? OUT_OF_BOUNDS : col + lowerRow*M;
+        }
+    }
+
     public Map<Integer, Set<Particle>> calculateNeighboursMap(){
         Map<Integer, Set<Particle>> neighbours = new HashMap<>();
 
@@ -55,30 +121,17 @@ public class Board {
         for (int i = 0; i < M * M; i++) {
             int row = i / M;
             int col = i % M;
-            int idx;
-            neighbours.get(i).addAll(particlesInCells.get(i));
 
-            int rightCol = Math.floorMod(i + 1, M);
-            idx = rightCol + row*M;
-            neighbours.get(i).addAll(particlesInCells.get(idx));
-            neighbours.get(idx).addAll(particlesInCells.get(i));
-
-            int upperRightRow = Math.floorMod(row - 1, M);
-            int upperRightCol = Math.floorMod(col + 1, M);
-            idx = upperRightCol + upperRightRow*M;
-            neighbours.get(i).addAll(particlesInCells.get(idx));
-            neighbours.get(idx).addAll(particlesInCells.get(i));
-
-            int lowerRightRow = Math.floorMod(row + 1, M);
-            int lowerRightCol = Math.floorMod(col + 1, M);
-            idx = lowerRightCol + lowerRightRow*M;
-            neighbours.get(i).addAll(particlesInCells.get(idx));
-            neighbours.get(idx).addAll(particlesInCells.get(i));
-
-            int lowerRow = Math.floorMod(row + 1, M);
-            idx = col + lowerRow*M;
-            neighbours.get(i).addAll(particlesInCells.get(idx));
-            neighbours.get(idx).addAll(particlesInCells.get(i));
+            //add this cell particles as neighbours
+            addNeighboursToCells(neighbours, i, i);
+            //add right neighbours
+            addNeighboursToCells(neighbours, i, getRightIndex(i, row, col));
+            //add upper right neigbours
+            addNeighboursToCells(neighbours, i, getUpperRightIndex(row, col));
+            //add lower right neighbours
+            addNeighboursToCells(neighbours, i, getLowerRightIndex(row, col));
+            //add lower neighbours
+            addNeighboursToCells(neighbours, i, getLowerIndex(row, col));
         }
 
         return neighbours;
