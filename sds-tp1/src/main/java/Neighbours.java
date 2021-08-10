@@ -20,6 +20,8 @@ public class Neighbours {
         Board board = new Board(5, 5, 1, particleList, false);
 
         Map<Integer, Set<Particle>> neighbours = board.calculateNeighboursMap();
+        //List<List<Particle>> neighbourLists = board.getNeighbours(particleList);
+        
         System.out.println(board);
 
     }

@@ -7,6 +7,7 @@ public class Board {
     private final double rc;
     private final boolean periodicOutline;
     final List<Particle> particles;
+    final Map<Integer, Set<Particle>> neighboursMap;
     final Map<Integer, List<Particle>> particlesInCells;
 
     private static final int OUT_OF_BOUNDS = -1;
@@ -18,6 +19,7 @@ public class Board {
         this.periodicOutline = periodicOutline;
         this.particles = particles;
         this.particlesInCells = divideParticles(particles);
+        this.neighboursMap = calculateNeighboursMap();
     }
 
     private Map<Integer, List<Particle>> divideParticles(List<Particle> particles){
@@ -135,5 +137,9 @@ public class Board {
         }
 
         return neighbours;
+    }
+
+    public List<List<Particle>> getNeighbours(List<Particle> particles) {
+        return null;
     }
 }

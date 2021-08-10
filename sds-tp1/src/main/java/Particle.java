@@ -18,6 +18,11 @@ public class Particle {
         this.state = new State(x, y, vx, vy);
     }
 
+    public double calculateDistance(Particle p) {
+        return Math.sqrt((Math.pow((getX() - p.getX()), 2) + Math.pow((getY() - p.getY()), 2)))
+                - radius - p.getRadius();
+    }
+
     public long getId() {
         return id;
     }
