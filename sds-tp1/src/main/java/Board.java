@@ -160,6 +160,24 @@ public class Board {
         return ret;
     }
 
+    public static Board getRandomBoard(int p, double l, int m, double rc, boolean periodicOutline) {
+
+        List<Particle> particles = new ArrayList<>();
+        double x, y, r;
+        for (int i = 0; i < p; i++) {
+            x = Math.random() * l;
+            y = Math.random() * l;
+            r = Math.random() * (l/m);
+            particles.add(new Particle(i, x, y, r));
+        }
+
+        return new Board(l, m, rc, particles, periodicOutline);
+    }
+
+    public List<Particle> getParticles() {
+        return particles;
+    }
+
     @Override
     public String toString() {
         StringBuilder b = new StringBuilder(M*M);

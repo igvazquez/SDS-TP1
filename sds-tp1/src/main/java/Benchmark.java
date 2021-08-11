@@ -11,15 +11,19 @@ public class Benchmark {
 
     public static void main(String[] args) throws FileNotFoundException {
 
+        InputStream inputStream = new FileInputStream("sds-tp1/src/main/resources/config.yaml");
 
+        Yaml yaml = new Yaml();
+        Map<String, Object> data = yaml.load(inputStream);
 
-//        Board board = Board.
+        Board board = Board.getRandomBoard((int)data.get("particles"),(double)data.get("boardLength"), (int)data.get("M"),
+                (double)data.get("radius"), (Boolean)data.get("periodicOutline"));
 
-//        System.out.println(board);
+        System.out.println(board);
         long totalNanos = 0;
         for (int i = 0; i < 100; i++) {
             long initTime = System.nanoTime();
-//            List<Particle> neighbourLists = board.getNeighboursOf(particleList.get(0));
+            List<Particle> neighbourLists = board.getNeighboursOf(board.getParticles().get(0));
             long finishTime = System.nanoTime();
             totalNanos += finishTime - initTime;
         }
