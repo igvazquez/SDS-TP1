@@ -1,0 +1,6 @@
+particles: 100
+particleRadius: 0.0
+boardLength: 10.0
+M: 10
+radius: 0.98
+periodicOutline: true

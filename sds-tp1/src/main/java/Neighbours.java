@@ -1,8 +1,18 @@
+import org.yaml.snakeyaml.Yaml;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.*;
 
 public class Neighbours {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
+
+        InputStream inputStream = new FileInputStream("sds-tp1/src/main/resources/config.yaml");
+
+        Yaml yaml = new Yaml();
+        Map<String, Object> data = yaml.load(inputStream);
 
         List<Particle> particleList = new ArrayList<>();
 
@@ -17,9 +27,9 @@ public class Neighbours {
         particleList.add(new Particle(9, 1.5, 4.5, 0));
 
 
-        Board board = new Board(5, 5, 1, particleList, false);
+        Board board = new Board((double)data.get("boardLength"), (int)data.get("M"),
+                (double)data.get("radius"), particleList, (Boolean)data.get("periodicOutline"));
 
-        Map<Integer, Set<Particle>> neighbours = board.calculateNeighboursMap();
         List<Particle> neighbourLists = board.getNeighboursOf(particleList.get(0));
         
         System.out.println(board);
