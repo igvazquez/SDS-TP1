@@ -1,20 +1,20 @@
 # Método a emplear: cellIdx || fBruta
 method: "cellIdx"
-randomize: true
+randomize: false
 
 # N y L
 totalParticles: 200
 boardLength: 70.0
 
 # Archivos de entrada
-staticFile: "filename1"
-dinamicFile: "filename2"
+staticFile: "sds-tp1/src/main/resources/static.txt"
+dynamicFile: "sds-tp1/src/main/resources/dynamic.txt"
 
-radius: 0.98
+radius: 0.5
 periodicOutline: true
 
 # 0 si quiero el óptimo
-M: 10
+M: 2
 
 # Default: output.txt
 fileName: ""

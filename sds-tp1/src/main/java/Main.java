@@ -1,5 +1,4 @@
 import org.yaml.snakeyaml.Yaml;
-
 import java.io.*;
 import java.util.*;
 
@@ -32,7 +31,7 @@ public final class Main {
             double l = (double) data.get("boardLength");
             board = Board.getRandomBoard(n,l,m);
         } else {
-            // TODO: Leer archivos de entrada
+            board = inputBoard((String)data.get("staticFile"), (String)data.get("dynamicFile"),m);
         }
 
         double rc = (double) data.get("radius");
@@ -60,6 +59,48 @@ public final class Main {
         int m = 0;
         // TODO: calcular M óptimo
         return m;
+    }
+
+    private static Board inputBoard(String staticFile, String dynamicFile, int m) {
+        Scanner st=null, din=null;
+        try {
+            st = new Scanner(new File(staticFile));
+            din = new Scanner(new File(dynamicFile));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        if(st!=null && din!=null) {
+            int n = 0;
+            long l = 0;
+            if (st.hasNextInt()) {
+                n = st.nextInt();
+                if (st.hasNextLong()) {
+                    l = st.nextLong();
+                }
+            }
+            if (din.hasNext("t.")) {     // t0
+                din.next();
+            }
+            List<Particle> particles = new ArrayList<>();
+            for (int i = 0; i < n && st.hasNextLine() && din.hasNextLine(); i++) {
+                System.out.println("Particle " + i);
+                double x = 0, y = 0, r = 0;
+                if (din.hasNextLine()) {;
+                    x = din.nextDouble();
+                    System.out.println("X "+x);
+                    y = din.nextDouble();
+                    System.out.println("Y "+y);
+                    din.nextLine(); // el resto de los datos no los usamos por ahora
+                }
+                if (st.hasNextLine()) {
+                    r = st.nextDouble();
+                    System.out.println("R " + r);
+                }
+                particles.add(new Particle(i, x, y, r));
+            }
+            return new Board(l, m, particles);
+        }
+        return null;
     }
 
     private static void cellIdxMethod(Board board, double rc, boolean per, String out) {
