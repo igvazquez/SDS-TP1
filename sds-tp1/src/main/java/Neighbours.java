@@ -10,7 +10,7 @@ public class Neighbours {
 
         public static void main(String[] args) throws FileNotFoundException {
 
-            String[] params = {"cellIdxRand", "3", "3", "0.9", "per", "3"};
+            String[] params = {"cellIdxRand", "200", "70", "1", "per", "10"};
             Main.main(params);
 
 //
