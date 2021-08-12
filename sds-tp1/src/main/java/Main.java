@@ -6,6 +6,8 @@ public final class Main {
 
     private final static String outputName = "output";
 
+    private static Map<String, Object> data;
+
     public static void main(String[] args) {
 
         InputStream inputStream = null;
@@ -15,26 +17,23 @@ public final class Main {
             System.out.println(e.getMessage());
         }
         Yaml yaml = new Yaml();
-        Map<String, Object> data = yaml.load(inputStream);
+        data = yaml.load(inputStream);
         if(data.isEmpty()) {
             throw new IllegalArgumentException("No se han detectado argumentos. Ingrese 'ayuda' para más información.");
         }
 
-        int m = (int) data.get("M");
-        if(m == 0) {
-            m = optM();
-        }
+        double rc = (double) data.get("radius");
 
-        Board board = null;
+        Board board;
         if((boolean)data.get("randomize")) {
             int n = (int) data.get("totalParticles");
             double l = (double) data.get("boardLength");
+            int m = getM(l);
             board = Board.getRandomBoard(n,l,m);
         } else {
-            board = inputBoard((String)data.get("staticFile"), (String)data.get("dynamicFile"),m);
+            board = inputBoard((String)data.get("staticFile"), (String)data.get("dynamicFile"));
         }
 
-        double rc = (double) data.get("radius");
         boolean per = (boolean) data.get("periodicOutline");
         String out = (String) data.get("fileName");
         if(out.isEmpty()) {
@@ -47,7 +46,7 @@ public final class Main {
                 break;
 
             case "fBruta":
-                System.out.println("Implementar fBruta");
+                BruteForceMethod.BruteForce(board.getParticles(), rc);
                 break;
 
             default:
@@ -55,13 +54,21 @@ public final class Main {
         }
     }
 
-    private static int optM() {
-        int m = 0;
-        // TODO: calcular M óptimo
+    private static int optM(double rc, double l) {
+        return (int)Math.ceil(l / rc);
+    }
+
+    private static int getM(double l) {
+        int m = (int) data.get("M");
+        double rc = (double) data.get("radius");
+
+        if(m == 0) {
+            m = optM(l, rc);
+        }
         return m;
     }
 
-    private static Board inputBoard(String staticFile, String dynamicFile, int m) {
+    private static Board inputBoard(String staticFile, String dynamicFile) {
         Scanner st=null, din=null;
         try {
             st = new Scanner(new File(staticFile));
@@ -85,7 +92,7 @@ public final class Main {
             for (int i = 0; i < n && st.hasNextLine() && din.hasNextLine(); i++) {
                 System.out.println("Particle " + i);
                 double x = 0, y = 0, r = 0;
-                if (din.hasNextLine()) {;
+                if (din.hasNextLine()) {
                     x = din.nextDouble();
                     System.out.println("X "+x);
                     y = din.nextDouble();
@@ -98,7 +105,7 @@ public final class Main {
                 }
                 particles.add(new Particle(i, x, y, r));
             }
-            return new Board(l, m, particles);
+            return new Board(l, getM(l), particles);
         }
         return null;
     }
@@ -208,4 +215,5 @@ public final class Main {
             e.printStackTrace();
         }
     }
+
 }
