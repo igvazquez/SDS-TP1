@@ -1,76 +1,85 @@
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import org.yaml.snakeyaml.Yaml;
+
+import java.io.*;
 import java.util.*;
 
 public final class Main {
 
+    private final static String outputName = "output";
+
     public static void main(String[] args) {
-        if(args.length == 0) {
+
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream("sds-tp1/src/main/resources/config.yaml");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        Yaml yaml = new Yaml();
+        Map<String, Object> data = yaml.load(inputStream);
+        if(data.isEmpty()) {
             throw new IllegalArgumentException("No se han detectado argumentos. Ingrese 'ayuda' para más información.");
         }
-        switch (args[0]) {
-            case "ayuda":
-                System.out.println("NOTA: Los parámetros marcados con * son opcionales.\n" +
-                                    "\tcellIdx <STATIC DATA FILE> <DINAMIC DATA FILE> <Rc> <per | nper> <M*>\n" +
-                                    "\tcellIdxRand <N> <L> <Rc> <per | nper> <M*>\n" +
-                                    "\tfBruta <STATIC DATA FILE> <DINAMIC DATA FILE> <Rc> <per | nper>\n" +
-                                    "\tfBrutaRand <N> <L> <Rc> <per | nper>\n");
-                break;
+
+        int m = (int) data.get("M");
+        if(m == 0) {
+            m = optM();
+        }
+
+        Board board = null;
+        if((boolean)data.get("randomize")) {
+            int n = (int) data.get("totalParticles");
+            double l = (double) data.get("boardLength");
+            board = Board.getRandomBoard(n,l,m);
+        } else {
+            // TODO: Leer archivos de entrada
+        }
+
+        double rc = (double) data.get("radius");
+        boolean per = (boolean) data.get("periodicOutline");
+        String out = (String) data.get("fileName");
+        if(out.isEmpty()) {
+            out = outputName;
+        }
+
+        switch ((String) data.get("method")) {
             case "cellIdx":
+                cellIdxMethod(board, rc, per, out);
                 break;
-            case "cellIdxRand":
-                cellIdxMethod(args);
-                break;
+
             case "fBruta":
                 System.out.println("Implementar fBruta");
                 break;
-            case "fBrutaRand":
-                System.out.println("Implementar fBrutaRand");
-                break;
+
             default:
-                throw new IllegalArgumentException("Argumento inválido. Ingrese 'ayuda' para más información.");
+                throw new IllegalArgumentException("Argumento 'method' inválido.");
         }
     }
 
-    // cellIdxRand <N> <L> <Rc> <per | nper> <M*>
-    private static void cellIdxMethod(String[] args) {
-        if(args.length < 5 || args.length > 6) {  // M es opcional
-            throw new IllegalArgumentException("Cantidad de argumentos inválida. Ingrese 'ayuda' para más información.");
-        }
-        int m = Integer.parseInt(args[5]);
-//        int m;
-//        if(args.length == 5) {
-            // TODO: calcular M óptimo
-//        } else {
-//            m = Integer.parseInt(args[5]);
-//        }
-        int n = Integer.parseInt(args[1]);
-        double l = Double.parseDouble(args[2]);
-        Board board = Board.getRandomBoard(n,l,m);
+    private static int optM() {
+        int m = 0;
+        // TODO: calcular M óptimo
+        return m;
+    }
 
-        double rc = Double.parseDouble(args[3]);
-        boolean per = args[4].equals("per");
+    private static void cellIdxMethod(Board board, double rc, boolean per, String out) {
         Map<Particle, List<Particle>> neighbours = new HashMap<>();
-
         long initTime = System.nanoTime();
         CellIdxMethod method = new CellIdxMethod(board,rc,per);
         for(Particle p : board.getParticles()) {
             neighbours.put(p, method.getNeighboursOf(p));
-//            System.out.println("Vecinos de " + p.getId() + "\t" + neighbours.get(p));
         }
         long finishTime = System.nanoTime();
         String benchmark = String.format("Tiempo transcurrido: %g (ms)",(finishTime-initTime)/(Math.pow(10,6)));
         System.out.println(benchmark);
 
-        output(neighbours);
+        output(neighbours, out);
         visual(neighbours);
     }
 
-    private static void output(Map<Particle, List<Particle>> neighbours) {
+    private static void output(Map<Particle, List<Particle>> neighbours, String fileName) {
         try {
-            // TODO: Permitir nombre de archivo como parámetro
-            FileWriter out = new FileWriter("output.txt",false);
+            FileWriter out = new FileWriter(fileName + ".txt",false);
             BufferedWriter buffer = new BufferedWriter(out);
             for(Particle current : neighbours.keySet()) {
                 buffer.write("[ " + current.getId() + "\t");
@@ -85,7 +94,7 @@ public final class Main {
             buffer.flush();
             buffer.close();
             out.close();
-            System.out.println("Resultados en output.txt");
+            System.out.println("Resultados en " + fileName + ".txt");
         } catch (IOException e) {
             System.out.println("Ha ocurrido un error.");
             e.printStackTrace();
@@ -103,16 +112,23 @@ public final class Main {
 
     private static void visual(Map<Particle, List<Particle>> neighbours) {
         System.out.println("\nGenere visualización de vecinos indicando las IDs de las partículas a evaluar separadas por espacios.\n" +
-                            "Para terminar, ingrese 'f' y presione enter.");
+                            "Puede indicar al final un nombre para el archivo de salida. Para terminar, ingrese ; y presione enter");
         Scanner sc = new Scanner(System.in);
         List<Long> ids = new ArrayList<>();
         while (sc.hasNextInt()) {
             ids.add(sc.nextLong());
         }
+        String fileName = "visualization";
+        if (sc.hasNext()) {
+            String next = sc.next();
+            if(!next.equals(";")) {
+                fileName = next;
+            }
+        }
         sc.close();
         System.out.println("Procesando " + ids);
         try {
-            FileWriter vis = new FileWriter("visualization.xyz",false);
+            FileWriter vis = new FileWriter(fileName + ".xyz",false);
             BufferedWriter buffer = new BufferedWriter(vis);
 
             buffer.write(String.valueOf(neighbours.keySet().size()));
@@ -145,7 +161,7 @@ public final class Main {
             buffer.flush();
             buffer.close();
             vis.close();
-            System.out.println("Resultados en visualization.xyz");
+            System.out.println("Resultados en " + fileName + ".xyz");
         } catch (IOException e) {
             System.out.println("Ha ocurrido un error.");
             e.printStackTrace();
