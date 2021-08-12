@@ -64,6 +64,10 @@ public final class Main {
 
         if(m == 0) {
             m = optM(l, rc);
+        } else {
+            if(l / m < rc) {
+                throw new IllegalArgumentException("Argumento 'M' inválido.");
+            }
         }
         return m;
     }
