@@ -47,7 +47,7 @@ public final class Main {
 
             case "fBruta":
                 if(board != null) {
-                    BruteForceMethod.BruteForce(board.getParticles(), rc);
+                    BruteForceMethod.BruteForce(board.getParticles(), rc, board.getL(), per);
                 }
                 break;
 

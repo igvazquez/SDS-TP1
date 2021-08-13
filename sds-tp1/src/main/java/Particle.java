@@ -18,9 +18,22 @@ public class Particle {
         this.state = new State(x, y, vx, vy);
     }
 
-    public double calculateDistance(Particle p) {
-        return Math.sqrt(Math.pow((getX() - p.getX()), 2) + Math.pow((getY() - p.getY()), 2))
-                - radius - p.getRadius();
+    public double calculateDistance(Particle p, double L, boolean periodicOutline) {
+        double x = distanceFromAxis(getX(), p.getX(), L, periodicOutline);
+        double y = distanceFromAxis(getY(), p.getY(), L, periodicOutline);
+
+        return Math.sqrt(x*x + y*y) - radius - p.getRadius();
+    }
+
+    private double distanceFromAxis(double ax1, double ax2, double L, boolean periodicOutline){
+        double distance = Math.abs(ax1 - ax2);
+
+        if (periodicOutline){
+            if(distance > L/2){
+                distance = L - distance;
+            }
+        }
+        return distance;
     }
 
     public long getId() {
