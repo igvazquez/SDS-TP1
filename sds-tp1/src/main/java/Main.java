@@ -2,6 +2,8 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.*;
 import java.util.*;
 
+import static java.lang.Thread.sleep;
+
 public final class Main {
 
     private final static String outputName = "output";
@@ -29,7 +31,7 @@ public final class Main {
             double l = (double) data.get("boardLength");
             double maxR = (double) data.get("maxR");
             int m = getM(l);
-            board = Board.getRandomBoard(n,l,m,maxR);
+            board = Board.getRandomBoardFile(n,l,m,maxR);
         } else {
             board = inputBoard((String)data.get("staticFile"), (String)data.get("dynamicFile"));
         }
@@ -70,7 +72,11 @@ public final class Main {
         return maxR;
     }
 
-    private static int optM(double rc, double l) { return (int)Math.floor(l / (rc+2*getMaxR())); }
+    private static int optM(double rc, double l) {
+        int m = (int)Math.floor(l / (rc+2*getMaxR()));
+        System.out.println("M óptimo: "+m);
+        return m;
+    }
 
     private static int getM(double l) {
         int m = (int) data.get("M");
@@ -80,7 +86,8 @@ public final class Main {
             m = optM(rc,l);
         } else {
             if(l / m < rc) {
-                throw new IllegalArgumentException("Argumento 'M' inválido.");
+                System.out.println((int)(l/rc)+" es el M max aceptado");
+                throw new IllegalArgumentException("Argumento 'M' inválido. No cumple M < L/Rc");
             }
         }
         return m;
@@ -96,11 +103,11 @@ public final class Main {
         }
         if(st!=null && din!=null) {
             int n = 0;
-            long l = 0;
+            double l = 0;
             if (st.hasNextInt()) {
                 n = st.nextInt();
-                if (st.hasNextLong()) {
-                    l = st.nextLong();
+                if (st.hasNextDouble()) {
+                    l = Double.parseDouble(st.next());
                 }
             }
             if (din.hasNext("t.")) {     // t0
@@ -119,7 +126,8 @@ public final class Main {
                 }
                 particles.add(new Particle(i, x, y, r));
             }
-            return new Board(l, getM(l), particles);
+//            System.out.println("L "+l);
+            return new Board(l, getMFile(l,particles), particles);
         }
         return null;
     }
@@ -137,6 +145,7 @@ public final class Main {
 
         output(neighbours, out);
         visual(neighbours);
+
     }
 
     private static void bruteForceMethod(Board board, double rc, boolean per, String out) {
@@ -238,5 +247,41 @@ public final class Main {
             e.printStackTrace();
         }
     }
+
+    private static double getMaxRFile(List<Particle> particles) {
+        double maxR = 0;
+        if((boolean) data.get("randomize")) {
+            maxR = (double) data.get("maxR");
+        } else {
+            for(Particle p : particles) {
+                if(p.getRadius()>maxR) {
+                    maxR = p.getRadius();
+                }
+            }
+        }
+        return maxR;
+    }
+
+    private static int optMFile(double rc, double l,List<Particle> particles) {
+        int m = (int)Math.floor(l / (rc+2*getMaxRFile(particles)));
+        System.out.println("M óptimo: "+m);
+        return m;
+    }
+
+    private static int getMFile(double l,List<Particle> particles) {
+        int m = (int) data.get("M");
+        double rc = (double) data.get("radius");
+
+        if(m == 0) {
+            m = optMFile(rc,l,particles);
+        } else {
+            if(l / m < rc) {
+                System.out.println((int)(l/rc)+" es el M max aceptado");
+                throw new IllegalArgumentException("Argumento 'M' inválido. No cumple M < L/Rc");
+            }
+        }
+        return m;
+    }
+
 
 }

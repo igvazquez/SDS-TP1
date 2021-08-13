@@ -3,17 +3,17 @@ method: "cellIdx"
 randomize: true
 
 # N, L, R
-totalParticles: 100
+totalParticles: 1000
 boardLength: 150.0
 maxR: 5.0
 
 # Archivos de entrada
-staticFile: "sds-tp1/src/main/resources/static.txt"
-dynamicFile: "sds-tp1/src/main/resources/dynamic.txt"
+staticFile: "sds-tp1/src/main/resources/newStatic.txt"
+dynamicFile: "sds-tp1/src/main/resources/newDynamic.txt"
 
 # Rc y condición de borde
 radius: 5.0
-periodicOutline: true
+periodicOutline: false
 
 # 0 si quiero el óptimo
 M: 0

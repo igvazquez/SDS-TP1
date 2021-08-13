@@ -1,3 +1,6 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class Board {
@@ -21,6 +24,9 @@ public class Board {
         }
         for(Particle p : particles){
             if (p.getX() < 0 || p.getX() > L || p.getY() < 0 || p.getY() > L){
+//                System.out.println(L);
+//                System.out.println(p.getX());
+//                System.out.println(p.getY());
                 throw new IllegalArgumentException();
             }
             cells.get(calculateCellIndexOnBoard(p.getX(), p.getY())).add(p);
@@ -34,10 +40,63 @@ public class Board {
         return i + M*j;
     }
 
+    public static Board getRandomBoardFile(int n, double l, int m, double maxR) {
+
+        List<Particle> particles = new ArrayList<>();
+
+        try {
+            FileWriter st = new FileWriter("sds-tp1/src/main/resources/newStatic.txt",false);
+            BufferedWriter stBuffer = new BufferedWriter(st);
+            FileWriter dyn = new FileWriter("sds-tp1/src/main/resources/newDynamic.txt",false);
+            BufferedWriter dynBuffer = new BufferedWriter(dyn);
+
+//            System.out.println(n);
+            stBuffer.write(String.valueOf(n));
+            stBuffer.newLine();
+            stBuffer.write(String.valueOf(l));
+            stBuffer.newLine();
+
+            dynBuffer.write("t0");
+            dynBuffer.newLine();
+
+            double x, y, r;
+            int i;
+            for (i = 0; i < n; i++) {
+                x = Math.random() * l;
+                y = Math.random() * l;
+                r = Math.random() * maxR;
+
+                dynBuffer.write(String.valueOf(x));
+                dynBuffer.write(" ");
+                dynBuffer.write(String.valueOf(y));
+                dynBuffer.newLine();
+
+                stBuffer.write(String.valueOf(r));
+                stBuffer.newLine();
+
+                particles.add(new Particle(i, x, y, r));
+            }
+
+            stBuffer.flush();
+            dynBuffer.flush();
+            stBuffer.close();
+            dynBuffer.close();
+            st.close();
+            dyn.close();
+            System.out.println("Nuevo tablero en newStatic.txt y newDynamic.txt");
+        } catch (IOException e) {
+            System.out.println("Ha ocurrido un error.");
+            e.printStackTrace();
+        }
+
+        return new Board(l, m, particles);
+    }
+
     public static Board getRandomBoard(int n, double l, int m, double maxR) {
         List<Particle> particles = new ArrayList<>();
         double x, y, r;
-        for (int i = 0; i < n; i++) {
+        int i;
+        for (i = 0; i < n; i++) {
             x = Math.random() * l;
             y = Math.random() * l;
             r = Math.random() * maxR;
