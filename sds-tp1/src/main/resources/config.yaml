@@ -3,7 +3,7 @@ method: "cellIdx"
 randomize: true
 
 # N, L, R
-totalParticles: 100
+totalParticles: 1000
 boardLength: 150.0
 maxR: 5.0
 

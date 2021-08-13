@@ -47,7 +47,7 @@ public final class Main {
 
             case "fBruta":
                 if(board != null) {
-                    BruteForceMethod.BruteForce(board.getParticles(), rc, board.getL(), per);
+                    bruteForceMethod(board, rc, per, out);
                 }
                 break;
 
@@ -137,6 +137,15 @@ public final class Main {
 
         output(neighbours, out);
         visual(neighbours);
+    }
+
+    private static void bruteForceMethod(Board board, double rc, boolean per, String out) {
+        Map<Particle, List<Particle>> neighbours = new HashMap<>();
+        long initTime = System.nanoTime();
+        BruteForceMethod.BruteForce(board.getParticles(), rc, board.getL(), per);
+        long finishTime = System.nanoTime();
+        String benchmark = String.format("Tiempo transcurrido: %g (ms)",(finishTime-initTime)/(Math.pow(10,6)));
+        System.out.println(benchmark);
     }
 
     private static void output(Map<Particle, List<Particle>> neighbours, String fileName) {
