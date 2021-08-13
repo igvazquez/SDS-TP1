@@ -5,8 +5,8 @@ import java.util.*;
 public final class Main {
 
     private final static String outputName = "output";
-
     private static Map<String, Object> data;
+    private static Board board;
 
     public static void main(String[] args) {
 
@@ -24,12 +24,12 @@ public final class Main {
 
         double rc = (double) data.get("radius");
 
-        Board board;
         if((boolean)data.get("randomize")) {
             int n = (int) data.get("totalParticles");
             double l = (double) data.get("boardLength");
+            double maxR = (double) data.get("maxR");
             int m = getM(l);
-            board = Board.getRandomBoard(n,l,m);
+            board = Board.getRandomBoard(n,l,m,maxR);
         } else {
             board = inputBoard((String)data.get("staticFile"), (String)data.get("dynamicFile"));
         }
@@ -46,7 +46,9 @@ public final class Main {
                 break;
 
             case "fBruta":
-                BruteForceMethod.BruteForce(board.getParticles(), rc);
+                if(board != null) {
+                    BruteForceMethod.BruteForce(board.getParticles(), rc);
+                }
                 break;
 
             default:
@@ -54,16 +56,28 @@ public final class Main {
         }
     }
 
-    private static int optM(double rc, double l) {
-        return (int)Math.ceil(l / rc);
+    private static double getMaxR() {
+        double maxR = 0;
+        if((boolean) data.get("randomize")) {
+            maxR = (double) data.get("maxR");
+        } else {
+            for(Particle p : board.getParticles()) {
+                if(p.getRadius()>maxR) {
+                    maxR = p.getRadius();
+                }
+            }
+        }
+        return maxR;
     }
+
+    private static int optM(double rc, double l) { return (int)Math.floor(l / (rc+2*getMaxR())); }
 
     private static int getM(double l) {
         int m = (int) data.get("M");
         double rc = (double) data.get("radius");
 
         if(m == 0) {
-            m = optM(l, rc);
+            m = optM(rc,l);
         } else {
             if(l / m < rc) {
                 throw new IllegalArgumentException("Argumento 'M' inválido.");
@@ -94,18 +108,14 @@ public final class Main {
             }
             List<Particle> particles = new ArrayList<>();
             for (int i = 0; i < n && st.hasNextLine() && din.hasNextLine(); i++) {
-                System.out.println("Particle " + i);
                 double x = 0, y = 0, r = 0;
                 if (din.hasNextLine()) {
                     x = din.nextDouble();
-                    System.out.println("X "+x);
                     y = din.nextDouble();
-                    System.out.println("Y "+y);
                     din.nextLine(); // el resto de los datos no los usamos por ahora
                 }
                 if (st.hasNextLine()) {
                     r = st.nextDouble();
-                    System.out.println("R " + r);
                 }
                 particles.add(new Particle(i, x, y, r));
             }
@@ -195,7 +205,7 @@ public final class Main {
                     buffer.write(current.getId() + " " + current.getX() + " " + current.getY() + " " + current.getRadius() + " 255 0 0");
                     buffer.newLine();
                     for(Particle p : neighbours.get(current)) {
-                        if(p.getId() != id) {
+                        if(p.getId() != id && particles.contains(p)) {
                             buffer.write(p.getId() + " " + p.getX() + " " + p.getY() + " " + p.getRadius() + " 0 255 0");
                             buffer.newLine();
                             particles.remove(p);

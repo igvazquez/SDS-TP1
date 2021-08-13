@@ -1,20 +1,22 @@
 # Método a emplear: cellIdx || fBruta
 method: "cellIdx"
-randomize: false
+randomize: true
 
-# N y L
-totalParticles: 200
-boardLength: 70.0
+# N, L, R
+totalParticles: 100
+boardLength: 150.0
+maxR: 5.0
 
 # Archivos de entrada
 staticFile: "sds-tp1/src/main/resources/static.txt"
 dynamicFile: "sds-tp1/src/main/resources/dynamic.txt"
 
-radius: 0.5
+# Rc y condición de borde
+radius: 5.0
 periodicOutline: true
 
 # 0 si quiero el óptimo
-M: 2
+M: 0
 
 # Default: output.txt
 fileName: ""

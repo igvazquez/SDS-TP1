@@ -34,13 +34,13 @@ public class Board {
         return i + M*j;
     }
 
-    public static Board getRandomBoard(int n, double l, int m) {
+    public static Board getRandomBoard(int n, double l, int m, double maxR) {
         List<Particle> particles = new ArrayList<>();
         double x, y, r;
         for (int i = 0; i < n; i++) {
             x = Math.random() * l;
             y = Math.random() * l;
-            r = Math.random() * (l/m);
+            r = Math.random() * maxR;
             particles.add(new Particle(i, x, y, r));
         }
         return new Board(l, m, particles);
