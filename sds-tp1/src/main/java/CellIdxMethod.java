@@ -4,6 +4,7 @@ public class CellIdxMethod {
     private final Board board;
     private final double rc;
     private final int M;
+    private final boolean per;
     private final Map<Integer, Set<Particle>> neighboursMap;
 
     private static final int OUT_OF_BOUNDS = -1;
@@ -11,6 +12,7 @@ public class CellIdxMethod {
     public CellIdxMethod(Board board, double rc, boolean per) {
         this.board = board;
         this.rc = rc;
+        this.per = per;
         M = board.getM();
 
         neighboursMap = new HashMap<>();
@@ -107,7 +109,7 @@ public class CellIdxMethod {
         int idx = board.calculateCellIndexOnBoard(particle.getX(), particle.getY());
         Set<Particle> neighbours = neighboursMap.get(idx);
         for (Particle n : neighbours){
-            if (particle.calculateDistance(n) < rc){
+            if (particle.calculateDistance(n, board.getL(), per) < rc){
                 ret.add(n);
             }
         }
